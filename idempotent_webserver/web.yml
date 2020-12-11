@@ -1,0 +1,39 @@
+- hosts: webserver
+  vars:
+          port_no: "8085"
+          dir_path: "/var/www/akansh"
+          software: "httpd"
+  tasks:
+  - package:
+          name: "{{  software  }}"
+          state: present
+
+  - file:
+          state: directory
+          path: "{{  dir_path  }}" 
+
+  - copy:
+          src: "/var/www/html/index.html"
+          dest: "{{  dir_path  }}"
+
+  - template:
+          src: "/root/ansible_tasks/idempotent_webserver/lw.conf"
+          dest: "/etc/httpd/conf.d/lw.conf"
+    notify:
+          - Restart httpd
+
+  - firewalld:
+          port: "{{  port_no  }}/tcp"
+          state: enabled
+          permanent: yes
+          immediate: yes
+
+  - service:
+          name: "{{  software  }}"
+          state: started
+
+  handlers:
+          - name: Restart httpd
+            service:
+                    name: "{{  software  }}"
+                    state: restarted
