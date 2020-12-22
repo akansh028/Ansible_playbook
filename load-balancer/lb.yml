@@ -1,0 +1,108 @@
+- hosts: my-load_balancer
+  tasks:
+  - name: "Mount directory"
+    file:
+          path: "/dvd1"
+          state: directory
+  
+  - name: "Mounting of the directory"
+    mount:
+          src: "/dev/sr0"
+          path: "/dvd1"
+          fstype: "iso9660"
+          state: mounted
+
+  - yum_repository:
+          name: AppStream
+          description: Packages from Appstream
+          file: akansh
+          baseurl: "/dvd1/AppStream"
+          gpgcheck: no
+
+  - yum_repository:
+          name: BaseOS
+          description: Packages from BaseOS
+          file: akansh
+          baseurl: "/dvd1/BaseOS"
+          gpgcheck: no
+
+  - name: "Installation of the haproxy package"
+    package:
+          name: "haproxy"
+          state: present
+
+  - name: "Copying the haproxy file"
+    template:
+          dest: "/etc/haproxy/haproxy.cfg"
+          src: "/etc/haproxy/haproxy.cfg"
+
+  - name: "Disabling Selinux"
+    selinux:
+          state: disabled
+
+  - name: "Restarting the haproxy service" 
+    service:
+          name: "haproxy"
+          state: restarted
+
+  - name: "Firewalld disabled"
+    firewalld:
+          port: "8085/tcp"
+          state: enabled
+          permanent: yes
+          immediate: yes
+
+- hosts: my-webserver
+  tasks:
+  - name: "Mount directory"
+    file:
+          path: "/dvd1"
+          state: directory
+
+  - name: "Mounting of the directory"
+    mount:
+          src: "/dev/sr0"
+          path: "/dvd1"
+          fstype: "iso9660"
+          state: mounted
+  
+  - yum_repository:
+          name: AppStream
+          description: Packages from Appstream
+          file: akansh
+          baseurl: "/dvd1/AppStream"
+          gpgcheck: no
+
+  - yum_repository:
+          name: BaseOS
+          description: Packages from BaseOS
+          file: akansh
+          baseurl: "/dvd1/BaseOS"
+          gpgcheck: no
+
+  - name: "Installation of the httpd"
+    package: 
+          name: "httpd"
+          state: present
+
+  - name: "Copying the content"
+    copy: 
+          dest: "/var/www/html"
+          src: "/root/index.php"
+
+  - name: "Disabling Selinux"
+    selinux:
+          state: disabled
+
+  - name: "Restarting the httpd service"
+    service:
+          name: "httpd"
+          state: restarted
+
+  - name: "Firewalld disabled"
+    firewalld:
+          port: "80/tcp"
+          state: enabled
+          permanent: yes
+          immediate: yes
+
