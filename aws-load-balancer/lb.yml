@@ -1,0 +1,36 @@
+- hosts: localhost
+
+  vars_files:
+  - mysecret.yml
+
+  tasks:
+
+  - pip:
+          name: "boto3"
+
+  - file:
+          path: "{{  inventory_path  }}"
+          state: touch
+
+  - lineinfile:
+          path: "{{  inventory_path  }}"
+          line: "[my-load_balancer]"
+
+  - ec2_instance:
+          image_id: "ami-08f63db601b82ff5f"
+          instance_type: "t2.micro"
+          vpc_subnet_id: "subnet-0b45e8a5911785cc1"
+          key_name: "{{  keyname  }}"
+          security_group: "sg-0dfd77002c8094443"
+          region: "ap-south-1"
+          name: "{{ lb_name  }}"
+          state: present
+          aws_access_key: "{{  accesskey  }}"
+          aws_secret_key: "{{  secretkey  }}"
+          
+    register: x
+
+  - lineinfile:
+          path: "{{  inventory_path  }}"
+          line: "{{  x.instances[0].public_ip_address  }}"
+

@@ -1,0 +1,8 @@
+- hosts: my-load_balancer
+  tasks:
+  - template:
+          src: "/etc/haproxy/haproxy.cfg"
+          dest: "/etc/haproxy"
+  - service:
+          name: "haproxy"
+          state: started

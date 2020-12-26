@@ -1,0 +1,26 @@
+- hosts: localhost
+
+  vars_files:
+  - mysecret.yml
+
+  tasks:
+
+  - name: "Provisioning aws ec2-instance for the Load balancer"
+    shell:
+            cmd: "ansible-playbook lb.yml"
+
+  - name: "Installing Haproxy and configuring the Load Balancer"
+    shell:
+            cmd: "ansible-playbook haproxy.yml"
+
+  - name: "Provisioning aws ec2-instances for the Webservers"
+    shell:
+            cmd: "ansible-playbook webserver.yml"
+
+  - name: "Installing httpd and php in the Webservers"
+    shell:
+            cmd: "ansible-playbook httpd.yml"
+
+  - name: "Starting the haproxy load balancer services"
+    shell:
+            cmd: "ansible-playbook start.yml"

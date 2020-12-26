@@ -1,0 +1,38 @@
+- hosts: localhost
+
+  vars_files:
+  - mysecret.yml
+
+  tasks:
+
+  - ec2_instance:
+          image_id: "ami-08f63db601b82ff5f"
+          instance_type: "t2.micro"
+          vpc_subnet_id: "subnet-073b62b097cf2f693"
+          key_name: "{{  keyname  }}"
+          security_group: "sg-0dfd77002c8094443"
+          region: "ap-south-1"
+          name: "my-webserver1"
+          state: present
+          aws_access_key: "{{  accesskey  }}"
+          aws_secret_key: "{{  secretkey  }}"
+    register: x
+  - lineinfile:
+          path: "{{  inventory_path  }}"
+          line: "{{  x.instances[0].public_ip_address  }}"
+  
+  - ec2_instance:
+          image_id: "ami-08f63db601b82ff5f"
+          instance_type: "t2.micro"
+          vpc_subnet_id: "subnet-073b62b097cf2f693"
+          key_name: "{{  keyname  }}"
+          security_group: "sg-0dfd77002c8094443"
+          region: "ap-south-1"
+          name: "my-webserver2"
+          state: present
+          aws_access_key: "{{  accesskey  }}"
+          aws_secret_key: "{{  secretkey  }}"
+    register: y
+  - lineinfile:
+          path: "{{  inventory_path  }}"
+          line: "{{  y.instances[0].public_ip_address  }}"

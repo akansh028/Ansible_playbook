@@ -1,0 +1,18 @@
+- hosts: my-load_balancer
+  tasks:
+  - package:
+          name: "haproxy"
+          state: present
+
+- hosts: localhost
+
+  vars_files:
+  - mysecret.yml
+
+  tasks:
+
+  - lineinfile:
+          path: "{{  inventory_path  }}"
+          line: "[my-webserver]"
+
+
